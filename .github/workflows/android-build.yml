@@ -1,0 +1,48 @@
+
+name: ENIDEX Android Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'ENIDEX_Mobile_Android_Project.zip'
+      - '.github/workflows/android-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract Android project
+        run: |
+          mkdir -p "$RUNNER_TEMP/enidex-project"
+          unzip -q ENIDEX_Mobile_Android_Project.zip -d "$RUNNER_TEMP/enidex-project"
+          test -f "$RUNNER_TEMP/enidex-project/ENIDEX_Mobile/settings.gradle"
+          echo "PROJECT_DIR=$RUNNER_TEMP/enidex-project/ENIDEX_Mobile" >> "$GITHUB_ENV"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build debug APK
+        run: gradle -p "$PROJECT_DIR" assembleDebug --stacktrace
+
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ENIDEX-debug-apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
