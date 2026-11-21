@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'ENIDEX_Mobile_Android_Project_FIXED'
+      - 'ENIDEX_Mobile_Android_Project_FIXED.zip'
       - '.github/workflows/android-build.yml'
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
       - name: Extract Android project
         run: |
           mkdir -p "$RUNNER_TEMP/enidex-project"
-          unzip -q ENIDEX_Mobile_Android_Project_FIXED -d "$RUNNER_TEMP/enidex-project"
+          unzip -q ENIDEX_Mobile_Android_Project_FIXED.zip -d "$RUNNER_TEMP/enidex-project"
           test -f "$RUNNER_TEMP/enidex-project/ENIDEX_Mobile/settings.gradle"
           echo "PROJECT_DIR=$RUNNER_TEMP/enidex-project/ENIDEX_Mobile" >> "$GITHUB_ENV"
 
